@@ -2,25 +2,25 @@
 // let products = require("../../data");
 const Product = require("../../db/Models/Product");
 
-exports.productList = async (req, res) => {
+exports.productList = async (req, res, next) => {
   try {
     const products = await Product.find();
     return res.json(products);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
-exports.productCreate = async (req, res) => {
+exports.productCreate = async (req, res, next) => {
   try {
     const newProduct = await Product.create(req.body);
     return res.status(201).json(newProduct);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
-exports.productDelete = async (req, res) => {
+exports.productDelete = async (req, res, next) => {
   try {
     const { productId } = req.params;
     const productDelete = Product.findById(productId);
@@ -28,14 +28,17 @@ exports.productDelete = async (req, res) => {
       await Product.remove(productDelete);
       return res.status(204).end();
     } else {
-      return res.status(404).json({ message: "Product not found" });
+      next({
+        status: 404,
+        message: "Product not found!",
+      });
     }
   } catch (error) {
-    return res.status(500).json({ message: "Note Found" });
+    next(error);
   }
 };
 
-exports.productUpdate = async (req, res) => {
+exports.productUpdate = async (req, res, next) => {
   try {
     const productId = req.params.productId;
     // const product = await Product.findById(productId);
@@ -50,6 +53,6 @@ exports.productUpdate = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
